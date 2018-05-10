@@ -116,6 +116,15 @@ PASSWORD_HASHERS = [
         'django.contrib.auth.hashers.PBKDF2PasswordHasher',
         ]
 
+# Get a token from
+# https://dev.socrata.com/register
+# Not strictly necessary, but a good idea
+# Create a file called local_settings.py in the same directory
+# as this settings.py file and add
+# SOCRATA_APP_TOKEN = 'mytoken'
+# to it
+SOCRATA_APP_TOKEN = None
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
@@ -135,3 +144,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Include local_settings if present
+try:
+    from .local_settings import *  # NOQA
+except ImportError:
+    pass

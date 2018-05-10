@@ -8,11 +8,13 @@ django = "*"
 "argon2-cffi" = "*"
 bcrypt = "*"
 "psycopg2-binary" = "*"
+sodapy = "*"
 
 [dev-packages]
 sphinx = "*"
 sphinx-autobuild = "*"
 "flake8" = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.6"
