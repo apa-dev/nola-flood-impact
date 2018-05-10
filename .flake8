@@ -1,0 +1,4 @@
+# vim: ft=dosini
+
+[flake8]
+max-line-length = 120

@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "*"
+"argon2-cffi" = "*"
+bcrypt = "*"
+"psycopg2-binary" = "*"
+
+[dev-packages]
+sphinx = "*"
+sphinx-autobuild = "*"
+"flake8" = "*"
+
+[requires]
+python_version = "3.6"
