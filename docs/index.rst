@@ -12,6 +12,8 @@ Welcome to NOLA Flood Impact's documentation!
 
    data_sources
    postgis
+   socrata
+   etl
 
 
 To build this documentation, with the virtual environment activated, run ``make html`` in the ``docs`` folder.
