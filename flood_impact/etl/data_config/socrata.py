@@ -62,7 +62,19 @@ NOLA_DATASETS = [
 
 
 # TODO: Have option of using a S3 bucket or some other cloud object storage
+# The directory to store downloaded distribution files
 DATASTORE = os.path.join(settings.BASE_DIR, 'etl', 'datastore')
+
+# The name of the directory in DATASTORE where original downloaded distribution
+# files will be stored
+DATASTORE_ORIG_NAME = 'orig'
+
+# The name of the directory in DATASTORE where staged downloaded distribution
+# files will be stored (e.g., unzipped contents of a zip file or some other
+# alteration of an original downloaded file before further processing, such as
+# loading into a database
+DATASTORE_STAGING_NAME = 'staging'
+
 
 # Mapping of mime types (`mediaType` from Socrata) to file extensions
 MIME_EXTENSIONS = {

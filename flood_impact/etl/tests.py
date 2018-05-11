@@ -74,7 +74,7 @@ class SocrataCatalogItemTestCase(TestCase):
                 shapefile_url[0],
                 'https://data.nola.gov/api/geospatial/4tiv-n7fd?method=export&format=KML'
                 )
-        self.assertIsNone(catalog_item.get_distribution_type_url('GeoJSON'))
+        self.assertIsNone(atalog_item.get_distribution_type_url('GeoJSON'))
 
     def test_slug(self):
         slug_pattern = re.compile('\w{4}-\w{4}', re.ASCII)

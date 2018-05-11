@@ -1,10 +1,12 @@
 import os
 import re
 import requests
+import zipfile
 
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
+from django.utils import timezone
 
 from etl.data_config import socrata as socrata_config
 
@@ -24,6 +26,8 @@ class SocrataCatalogItem(models.Model):
     landing_page = models.URLField(max_length=255, null=True, blank=True)
     modified = models.DateField(null=True, blank=True)
     publisher = JSONField(null=True, blank=True)
+    orig_file_loc = models.CharField(max_length=255, null=True, blank=True)
+    last_downloaded_on = models.DateTimeField(null=True, blank=True)
 
     # TODO: full-text search
     title = models.CharField(max_length=255)
@@ -47,7 +51,7 @@ class SocrataCatalogItem(models.Model):
             for now, use :meth:`get_distribution_types` for available formats
 
         Returns:
-            tuple: (str: URL, str: mediaType)
+            tuple: (str: URL, str: file extension)
         """
 
         if not self.distribution:
@@ -84,20 +88,34 @@ class SocrataCatalogItem(models.Model):
         """
         return self.identifier.split('/')[-1]
 
+    @property
+    def orig_dir(self):
+        """Get the default orig_dir, based on the values in data_config.socrata
+
+        Returns:
+            str
+        """
+        return os.path.join(socrata_config.DATASTORE,
+                            socrata_config.DATASTORE_ORIG_NAME,
+                            'sci_{}'.format(self.pk))
+
     def download_distribution(self, url, extension, datastore=socrata_config.DATASTORE):
         """Download a file pointed to by one of the distribution URLs
 
         Args:
             url (str): The URL to fetch
-            extension (str): The file extension to use
+            extension (str): The file extension to use for the downloaded file
             datastore (str): File path to a directory to store the downloaded files
         Returns:
-            str: The full path to the downloaded file
+            None
         """
         # TODO: Would be nice to have semantically meaningful filenames, instead of
-        # sci_id
+        # sci_<pk>
         fname = 'sci_{}.{}'.format(self.pk, extension)
-        path = os.path.join(datastore, 'orig', fname)
+        orig_dir = os.path.join(datastore, socrata_config.DATASTORE_ORIG_NAME)
+        if not os.path.exists(orig_dir):
+            os.makedirs(orig_dir)
+        path = os.path.join(orig_dir, fname)
         req = requests.get(url=url,
                            stream=True,
                            headers={'X-App-Token': settings.SOCRATA_APP_TOKEN}
@@ -106,4 +124,30 @@ class SocrataCatalogItem(models.Model):
             for chunk in req.iter_content(chunk_size=1024):
                 if chunk:
                     outfile.write(chunk)
-        return path
+        self.orig_file_loc = path
+        self.last_downloaded_on = timezone.now()
+        self.save()
+
+    def extract_zip(self, path, extract_dir=None):
+        """Extract a zip file
+
+        Args:
+            path (str): The path to the zipfile to extract
+            extract_dir (str): Optional directory to extract the files to.
+                               If left blank, will default to the value configured
+                               in data_config.socrata (imported in this module as
+                               socrata_config)
+        Returns:
+            list: The list of paths to the extracted files
+        """
+        if extract_dir is None:
+            extract_dir = os.path.join(socrata_config.DATASTORE,
+                                       socrata_config.DATASTORE_STAGING_NAME,
+                                       'sci_{}'.format(self.pk))
+        try:
+            zf = zipfile.ZipFile(path)
+            zf.extractall(path=extract_dir)
+            return list(map(os.path.join(extract_dir, [x for x in zf.namelist()])))
+        except Exception as exc:
+            print('Unable to unzip {}'.format(path))
+            print('Error was: {}'.format(exc.__str__()))
