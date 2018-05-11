@@ -1,8 +1,8 @@
 import os
 import re
-import requests
 import zipfile
 
+import requests
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
@@ -90,14 +90,53 @@ class SocrataCatalogItem(models.Model):
 
     @property
     def orig_dir(self):
-        """Get the default orig_dir, based on the values in data_config.socrata
+        """Get the default original directory, based on the values in data_config.socrata
 
         Returns:
             str
         """
         return os.path.join(socrata_config.DATASTORE,
-                            socrata_config.DATASTORE_ORIG_NAME,
+                            socrata_config.DATASTORE_ORIG_NAME)
+
+    @property
+    def staging_dir(self):
+        """Get the default staging directory, based on the values in data_config.socrata
+
+        Returns:
+            str
+        """
+        return os.path.join(socrata_config.DATASTORE,
+                            socrata_config.DATASTORE_STAGING_NAME,
                             'sci_{}'.format(self.pk))
+
+    def get_staging_file_list(self):
+        """Get the list of files in this item's staging directory
+
+        Returns:
+            list
+        """
+        if os.path.exists(self.staging_dir):
+            return os.listdir(self.staging_dir)
+        return []
+
+    def get_staged_file_path(self, name=None, extension=None):
+        """Get the full path to a file in the staging directory,
+        either by its exact name (with extension) or by only its extension.
+        Note that if you select the extension method, this function will return
+        the first file that matches.
+
+        Args:
+            name (str): Optional, the exact filename (with extension)
+            extension (str): Optional, the file extension
+        Returns:
+            str
+        """
+        if name is not None:
+            return os.path.join(self.staging_dir, name)
+        if extension is not None:
+            matches = [i for i in self.get_staging_file_list() if i.endswith(extension)]
+            if matches:
+                return os.path.join(self.staging_dir, matches[0])
 
     def download_distribution(self, url, extension, datastore=socrata_config.DATASTORE):
         """Download a file pointed to by one of the distribution URLs
@@ -105,21 +144,21 @@ class SocrataCatalogItem(models.Model):
         Args:
             url (str): The URL to fetch
             extension (str): The file extension to use for the downloaded file
-            datastore (str): File path to a directory to store the downloaded files
+            datastore (str): Path to a directory to store the downloaded files
         Returns:
             None
         """
         # TODO: Would be nice to have semantically meaningful filenames, instead of
         # sci_<pk>
         fname = 'sci_{}.{}'.format(self.pk, extension)
-        orig_dir = os.path.join(datastore, socrata_config.DATASTORE_ORIG_NAME)
-        if not os.path.exists(orig_dir):
-            os.makedirs(orig_dir)
-        path = os.path.join(orig_dir, fname)
+        if not os.path.exists(self.orig_dir):
+            os.makedirs(self.orig_dir)
+        path = os.path.join(self.orig_dir, fname)
         req = requests.get(url=url,
                            stream=True,
                            headers={'X-App-Token': settings.SOCRATA_APP_TOKEN}
                            )
+        req.raise_for_status()
         with open(path, 'wb') as outfile:
             for chunk in req.iter_content(chunk_size=1024):
                 if chunk:
@@ -144,10 +183,12 @@ class SocrataCatalogItem(models.Model):
             extract_dir = os.path.join(socrata_config.DATASTORE,
                                        socrata_config.DATASTORE_STAGING_NAME,
                                        'sci_{}'.format(self.pk))
+            if not os.path.exists(extract_dir):
+                os.makedirs(extract_dir)
         try:
             zf = zipfile.ZipFile(path)
             zf.extractall(path=extract_dir)
-            return list(map(os.path.join(extract_dir, [x for x in zf.namelist()])))
+            return [os.path.join(extract_dir, x) for x in zf.namelist()]
         except Exception as exc:
             print('Unable to unzip {}'.format(path))
             print('Error was: {}'.format(exc.__str__()))

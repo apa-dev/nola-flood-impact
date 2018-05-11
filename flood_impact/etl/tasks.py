@@ -1,17 +1,15 @@
 import requests
-from django.conf import settings
-from sodapy import Socrata
 
 from etl.data_config import socrata as socrata_config
 from etl.models import SocrataCatalogItem
 
-datasets = {k: v for (k, v) in socrata_config.NOLA_DATASETS}
-parcel_slug = datasets['Parcels']
-client = Socrata(socrata_config.NOLA_OPENDATA_DOMAIN, settings.SOCRATA_APP_TOKEN)
-
 
 def get_nola_catalog():
-    """Get the NOLA open data catalog"""
+    """Get the NOLA open data catalog
+
+    Returns:
+        dict
+    """
     url = 'http://{}'.format(socrata_config.NOLA_OPENDATA_DOMAIN)
     if url.endswith('/'):
         url += 'data.json'

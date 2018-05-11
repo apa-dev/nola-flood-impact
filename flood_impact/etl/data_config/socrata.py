@@ -4,9 +4,10 @@ from django.conf import settings
 
 
 # DO NOT include the http(s)://
+# sodapy no likey
 NOLA_OPENDATA_DOMAIN = 'data.nola.gov'
 
-# A dict of `title`: `slug` of key datasets from data.nola.gov that we
+# A list of `title`: `slug` of key datasets from data.nola.gov that we
 # are interested in
 NOLA_DATASETS = [
         ('311 Calls (2012-Present)'                               , '3iz8-nghx') ,
@@ -26,8 +27,11 @@ NOLA_DATASETS = [
         ('Evacuspots'                                             , 'ys6n-yuem') ,
         ('Festival Grounds'                                       , 's4g3-ky2w') ,
         ('Future Land Use'                                        , '66ys-xxcg') ,
+
+        # POSSIBLE DUPLICATES
         ('Lot'                                                    , '54dz-ss9h') ,
         ('Lot'                                                    , '92sr-5bi9') ,
+
         ('Master Street Name Table'                               , 'xizv-ihxa') ,
         ('NORA Sold Properties'                                   , 'hpm5-48nj') ,
         ('NORA Uncommitted Property Inventory'                    , '5ktx-e9wc') ,
@@ -38,17 +42,26 @@ NOLA_DATASETS = [
         ('Orleans Parish - Center of Waterway'                    , '2ytt-c2d9') ,
         ('Orleans Parish Boundary'                                , '5jjm-ygfn') ,
         ('Orleans Parish Landmass'                                , 'eqn9-sfv5') ,
+
+        # POSSIBLE DUPLICATES
         ('Overlay'                                                , 'ks2a-e4m8') ,
         ('Overlay Zoning Districts'                               , '4kce-8gm5') ,
+
         ('Parcels'                                                , '4tiv-n7fd') ,
+
+        # POSSIBLE DUPLICATES
         ('Permits'                                                , 'rcm3-fn58') ,
         ('Permits - BLDS'                                         , '72f9-bi28') ,
+
         ('Place Based Planning'                                   , 'ssw4-9pg7') ,
         ('Planning Districts'                                     , '3kp4-ecpw') ,
         ('Road Centerline'                                        , '3wh2-z5dr') ,
         ('Route Names'                                            , 'k6k3-kaiv') ,
+
+        # POSSIBLE DUPLICATES
         ('S&WB Projects'                                          , 'm6sf-i3xf') ,
         ('Sewerage & Water Board Projects'                        , 'jg5k-uvi2') ,
+
         ('Site Address Point'                                     , 'awd4-9fzf') ,
         ('Squares'                                                , 't5du-prgx') ,
         ('Urban Gardens'                                          , '6b2p-nf9y') ,

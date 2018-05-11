@@ -88,7 +88,7 @@ DATABASES = {
 }
 
 
-# Custom User model
+# Custom User model, for more flexibility if needed later
 # https://docs.djangoproject.com/en/2.0/topics/auth/customizing/#substituting-a-custom-user-model
 AUTH_USER_MODEL = 'myimpact.User'
 
