@@ -1,3 +1,8 @@
+import os
+
+from django.conf import settings
+
+
 # DO NOT include the http(s)://
 NOLA_OPENDATA_DOMAIN = 'data.nola.gov'
 
@@ -54,3 +59,16 @@ NOLA_DATASETS = [
         ('Zoning Districts'                                       , 'iz3t-uee6') ,
         ('Zoning Overlay'                                         , 'yi5p-wwpg')
     ]
+
+
+# TODO: Have option of using a S3 bucket or some other cloud object storage
+DATASTORE = os.path.join(settings.BASE_DIR, 'etl', 'datastore')
+
+# Mapping of mime types (`mediaType` from Socrata) to file extensions
+MIME_EXTENSIONS = {
+        'application/json': 'json',
+        'application/zip': 'zip',
+        'application/vnd.google-earth.kml+xml': 'kml',
+        'application/vnd.google-earth.kmz': 'kmz',
+        'text/csv': 'csv'
+        }

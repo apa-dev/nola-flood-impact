@@ -1,6 +1,10 @@
+import os
 import re
+from pathlib import Path
+
 from django.test import TestCase
 
+from etl.data_config import socrata
 from etl.models import SocrataCatalogItem
 
 
@@ -42,8 +46,7 @@ class SocrataCatalogItemTestCase(TestCase):
                 title='Parcels'
             )
 
-    def test_distribution_types(self):
-        self.assertEquals('dist', 'dist')
+    def test_get_distribution_types(self):
         dist_types = self.catalog_item.get_distribution_types()
 
         self.assertIn('KMZ', dist_types)
@@ -60,11 +63,15 @@ class SocrataCatalogItemTestCase(TestCase):
         catalog_item = SocrataCatalogItem.objects.get(identifier=self.IDENTIFIER)
         shapefile_url = catalog_item.get_distribution_type_url('Shapefile')
         self.assertEqual(
-                shapefile_url,
+                shapefile_url[0],
                 'https://data.nola.gov/api/geospatial/4tiv-n7fd?method=export&format=Shapefile'
                 )
+        self.assertEqual(
+                shapefile_url[1],
+                'application/zip'
+                )
         self.assertNotEqual(
-                shapefile_url,
+                shapefile_url[0],
                 'https://data.nola.gov/api/geospatial/4tiv-n7fd?method=export&format=KML'
                 )
         self.assertIsNone(catalog_item.get_distribution_type_url('GeoJSON'))
@@ -74,3 +81,9 @@ class SocrataCatalogItemTestCase(TestCase):
         catalog_item = SocrataCatalogItem.objects.get(identifier=self.IDENTIFIER)
 
         self.assertIsNotNone(slug_pattern.search(catalog_item.slug))
+
+    def test_datastore_location_is_accessible(self):
+        fname = os.path.join(socrata.DATASTORE, 'test')
+        Path(fname).touch()
+        self.assertIsNotNone(os.stat(fname))
+        os.unlink(fname)

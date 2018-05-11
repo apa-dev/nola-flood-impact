@@ -116,3 +116,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+flood_impact/etl/datastore/orig/
+flood_impact/etl/datastore/staging/
