@@ -1,3 +1,13 @@
 from django.test import TestCase
 
-# Create your tests here.
+
+class MyImpactTestCase(TestCase):
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_test_discover(self):
+        self.assertEquals('test', 'test')
