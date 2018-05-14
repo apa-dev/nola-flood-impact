@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.contrib.gis.db import models
+from django.contrib.gis.db.models import Union
 from django.contrib.auth.models import AbstractUser
 
 
@@ -37,6 +39,64 @@ class SiteAddressPoint(models.Model):
     time_last_updated = models.CharField(max_length=255, null=True, blank=True)
     the_geom = models.PointField(srid=4326)
 
+    def __repr__(self):
+        return '<SiteAddressPoint: {}>'.format(self.full_address)
+
+    def get_containing_parcel(self):
+        """Get the Parcel that contains this address point
+
+        Returns:
+            Parcel
+        """
+        parcel = Parcel.objects.filter(the_geom__contains=self.the_geom)
+        if parcel.count() == 1:
+            return parcel.first()
+
+    def get_building(self):
+        """Get the BuildingFootprint that contains (or is closest to the containing
+        parcel of) this address point
+
+        Returns:
+            BuildingFootprint
+        """
+        building = BuildingFootprint.objects.filter(the_geom__contains=self.the_geom)
+        if building.count() == 1:
+            return building.first()
+        elif building.count() == 0:
+            # Address points are not always placed on the building
+            # get the containing parcel
+            parcel = self.get_containing_parcel()
+            if parcel is not None:
+                # get the buildings
+                buildings = parcel.get_buildings()
+                if buildings.count() == 1:
+                    return buildings.first()
+                elif buildings.count() > 1:
+                    # return the building that has the most overlapping area
+                    intersecting_areas = []
+                    for building in buildings:
+                        intersecting_areas.append(
+                                (building.pk,
+                                 building.the_geom.transform(
+                                     settings.LOUISIANA_SOUTH_EPSG, clone=True)
+                                 .intersection(parcel.the_geom.transform(
+                                         settings.LOUISIANA_SOUTH_EPSG, clone=True)).area)
+                            )
+                    pk = sorted(intersecting_areas,
+                                key=lambda x: x[1],
+                                reverse=True)[0][0]
+                    return BuildingFootprint.objects.get(pk=pk)
+
+    def get_zoning(self):
+        """Get the zoning district that contains this address point
+
+        Returns:
+            ZoningDistrict
+        """
+        zoning_district = ZoningDistrict.objects.filter(the_geom__contains=self.the_geom)
+        if zoning_district.count() == 1:
+            return zoning_district.first()
+
 
 class Parcel(models.Model):
     """Model for the Parcels dataset from NOLA Open Data:
@@ -53,6 +113,50 @@ class Parcel(models.Model):
 
     shape_length = models.FloatField()
     the_geom = models.MultiPolygonField(srid=4326)
+
+    def __repr__(self):
+        return '<Parcel: {}>'.format(self.geopin)
+
+    def get_buildings(self):
+        """Get all the BuildingFootprint intersecting this Parcel
+
+        Returns:
+            django.db.models.query.QuerySet
+        """
+        return BuildingFootprint.objects.filter(the_geom__intersects=self.the_geom)
+
+    def get_building_intersection(self):
+        """Get the intersection of this parcel's geometry and the unioned geometry of all buildings intersecting
+        this parcel
+
+        Returns:
+            django.contrib.gis.geos.collections.MultiPolygon
+        """
+        buildings = self.get_buildings()
+        if buildings.count() > 0:
+            # Union the geometry of all buildings intersecting the parcel
+            unioned_buildings = buildings.aggregate(unioned=Union('the_geom'))['unioned']
+            # Take the intersection of the parcel and the unioned building geometry
+            return unioned_buildings.intersection(self.the_geom)
+
+    def get_non_building_geometry(self):
+        """Get the geometry of the parcel with all building footprint geometry removed
+
+        Returns:
+            django.contrib.gis.geos.collections.MultiPolygon
+        """
+        building_intersection = self.get_building_intersection()
+        return self.the_geom.difference(building_intersection)
+
+    @property
+    def non_building_area(self):
+        """Get the non-building area of this parcel in square feet
+
+        Returns:
+            dict
+        """
+        area = self.get_non_building_geometry().transform(settings.LOUISIANA_SOUTH_EPSG, clone=True).area
+        return {"area": area, "units": "square feet"}
 
 
 class BuildingFootprint(models.Model):
@@ -92,3 +196,6 @@ class ZoningDistrict(models.Model):
     date_created = models.DateField(null=True, blank=True)
     time_created = models.CharField(max_length=255, null=True, blank=True)
     the_geom = models.MultiPolygonField(srid=4326, null=True, blank=True)
+
+    def __repr__(self):
+        return '<ZoningDistrict: {}>'.format(self.zone_description)

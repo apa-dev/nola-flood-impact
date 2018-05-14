@@ -147,6 +147,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
+# NAD83 / Louisiana South (ft US) EPSG Code
+LOUISIANA_SOUTH_EPSG = 3452
+
 # Include local_settings if present
 try:
     from .local_settings import *  # NOQA
