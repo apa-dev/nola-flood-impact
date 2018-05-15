@@ -5,6 +5,8 @@ from django.contrib.gis.db import models
 from django.contrib.gis.db.models import Union
 from django.contrib.auth.models import AbstractUser
 
+from myimpact.calculator import FloodImpactCalculator
+
 
 class User(AbstractUser):
     pass
@@ -121,6 +123,25 @@ class SiteAddressPoint(models.Model):
                     description, default
                     )
         return next(x for x in settings.COVER_TYPES if x[0] == zoning_cover_type)
+
+    def impact_calculator(self, rainfall=1.5):
+        cover_type = self.get_cover_type()
+        parcel = self.get_containing_parcel()
+        if parcel is not None:
+            area = parcel.non_building_area['area']
+            calculator = FloodImpactCalculator(cover_type=cover_type[0],
+                                               area_square_feet=area,
+                                               rainfall=rainfall)
+            return {
+                    'success': True,
+                    'runoff_curve_number': calculator.runoff_curve_number,
+                    'soil_retention': calculator.soil_retention,
+                    'runoff_volume': calculator.calc_runoff_volume()
+                    }
+        return {
+                'success': False,
+                'message': 'Unable to locate parcel from this address'
+                }
 
 
 class Parcel(models.Model):

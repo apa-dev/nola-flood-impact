@@ -2,8 +2,8 @@ import json
 import os
 
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import TemplateView, FormView
 
 from myimpact.forms import AddressForm
@@ -64,3 +64,9 @@ def address_search(request):
                                               .values_list('full_address', flat=True)\
                                               .order_by('full_address')
             return JsonResponse(list(results), safe=False)
+
+
+def address_detail(request, address):
+    """Display the address detail view"""
+    address = get_object_or_404(SiteAddressPoint, full_address=address)
+    return JsonResponse(address.impact_calculator())

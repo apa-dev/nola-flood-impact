@@ -15,16 +15,16 @@ class FloodImpactCalculator(object):
 
         @property
         def runoff_curve_number(self):
-                return next(ct[2] for ct in settings.COVER_TYPES if ct[0] == self.cover_type)
+            return next(ct[2] for ct in settings.COVER_TYPES if ct[0] == self.cover_type)
 
         @property
         def soil_retention(self):
-                """max soil moisture retention... this is "S" in the model"""
-                return (1000 / self.runoff_curve_number) - 10
+            """max soil moisture retention... this is "S" in the model"""
+            return (1000 / self.runoff_curve_number) - 10
 
-        def calc_runoff(self, rainfall=1.5):
-                return ((rainfall - (0.2 * self.soil_retention))**2) / (rainfall + (0.8 * self.soil_retention))
+        def calc_runoff(self):
+            return ((self.rainfall - (0.2 * self.soil_retention))**2) / (self.rainfall + (0.8 * self.soil_retention))
 
-        def calc_runoff_volume(self, rainfall=1.5):
-                """ calculates runoff volume in cubic feet """
-                return self.calc_runoff(rainfall) * (1/12) * self.area_square_feet
+        def calc_runoff_volume(self):
+            """ calculates runoff volume in cubic feet """
+            return self.calc_runoff() * (1/12) * self.area_square_feet
