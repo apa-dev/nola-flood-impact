@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.gis.db.models import Union
@@ -96,6 +98,29 @@ class SiteAddressPoint(models.Model):
         zoning_district = ZoningDistrict.objects.filter(the_geom__contains=self.the_geom)
         if zoning_district.count() == 1:
             return zoning_district.first()
+
+    def get_cover_type(self, default="URBAN_RES"):
+        """Get the pervious surface coverage type (defined in myimpact.calculator)
+        for this address, based on the NOLA_ZONING_COVER_TYPE_MAPPING, also defined
+        in myimpact.calculator.
+
+        Args:
+            default (str): The default cover type to use if we missed one in the
+                           mapping, or if we have issues with whatever janky character
+                           encoding the zoning shapefile is in that's causing é to
+                           render as ?. I've tried iso-8859-1, latin1, utf-8, and...welp
+        Returns:
+            tuple
+        """
+        zoning = self.get_zoning()
+        if zoning is None:
+            zoning_cover_type = default
+        else:
+            description = zoning.zone_description
+            zoning_cover_type = settings.NOLA_ZONING_COVER_TYPE_MAPPING.get(
+                    description, default
+                    )
+        return next(x for x in settings.COVER_TYPES if x[0] == zoning_cover_type)
 
 
 class Parcel(models.Model):
