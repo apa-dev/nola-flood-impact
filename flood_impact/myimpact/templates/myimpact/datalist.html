@@ -1,0 +1,59 @@
+<form method="POST" action="/myimpact/address_search/" id="address-search-form">
+    <input type="text" id="address-search" />
+    <button type="submit" value="submit">Submit</button>
+</form>
+
+<script>
+
+    // https://docs.djangoproject.com/en/2.0/ref/csrf/#acquiring-the-token-if-csrf-use-sessions-is-false
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
+    var csrftoken = getCookie('csrftoken');
+
+    var form = document.getElementsByTagName('form')[0];
+    var input = document.getElementById("address-search");
+
+    form.onsubmit = function(e) {
+        e.preventDefault();
+
+        var post_data = {
+            query: form[0].value
+        };
+
+        console.log('request')
+        console.log(post_data);
+
+        var xhr = new XMLHttpRequest();
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                console.log('response');
+                console.log(xhr.response);
+            }
+        }
+
+        xhr.open(form.method, form.action, true);
+        xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.send(JSON.stringify(post_data));
+
+    }
+
+
+</script>

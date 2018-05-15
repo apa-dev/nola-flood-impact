@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
+    'django.contrib.postgres',
     'etl',
     'myimpact'
 ]
@@ -235,6 +236,6 @@ NOLA_ZONING_COVER_TYPE_MAPPING = {
 
 # Include local_settings if present
 try:
-    from .local_settings import *  # NOQA
+    from .local_settings import *
 except ImportError:
     pass
