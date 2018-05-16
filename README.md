@@ -30,7 +30,7 @@ $ docker run --name nola-postgis \
               mdillon/postgis:10
 ```
 
-If all goes well, you should have a PostGIS instance accessible on your `localhost` at port 5432 and should be able to connect to it with the parameters specified above. These are also the default in `flood_impact/settings.py`, so you now should be able to run database migrations. Change into the `flood_impact` repo and type:
+If all goes well, you should have a PostGIS instance accessible on your `localhost` at port 5432 and should be able to connect to it with the parameters specified above. These are also the default in `flood_impact/settings.py`, so you now should be able to run database migrations. Change into the `flood_impact` directory and type:
 
 ```bash
 $ python manage.py migrate
@@ -45,7 +45,7 @@ The project requires several datasets from [NOLA Open Data](https://data.nola.go
 * [Parcels](https://data.nola.gov/d/4tiv-n7fd)
 * [Zoning Districts](https://data.nola.gov/d/25ka-xtj7)
 
-The project includes an app called "etl" that should handle this for you (please open an issue if it does not!). This will eventually be turned into a [Django management command](https://docs.djangoproject.com/en/2.0/howto/custom-management-commands/), but until then you'll have to do it from an interactive shell:
+The project includes an app called `etl` that should handle this for you (please open an issue if it does not!). This will eventually be turned into a [Django management command](https://docs.djangoproject.com/en/2.0/howto/custom-management-commands/), but until then you'll have to do it from an interactive shell:
 
 ```bash
 $ python manage.py shell
@@ -72,7 +72,7 @@ $ python manage.py test
 $ python manage.py runserver
 ```
 
-You should now be able to access the proof-of-concept web form at http://localhost:8000/myimpact/ . That is the default, but you could change port or IP binding. For example, if you wanted to make it available to any device on your network on port 8181):
+You should now be able to access the proof-of-concept web form at http://localhost:8000/myimpact/ . That is the default, but you could change port or IP binding. For example, if you wanted to make it available to any device on your network on port 8181:
 
 ```bash
 $ python manage.py runserver 0.0.0.0:8181
