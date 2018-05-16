@@ -3,7 +3,7 @@ import os
 
 from django.conf import settings
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.views.generic import TemplateView, FormView
 
 from myimpact.forms import AddressForm
@@ -68,5 +68,11 @@ def address_search(request):
 
 def address_detail(request, address):
     """Display the address detail view"""
-    address = get_object_or_404(SiteAddressPoint, full_address=address)
-    return JsonResponse(address.json_response())
+    # address = get_object_or_404(SiteAddressPoint, full_address=address)
+    address = SiteAddressPoint.objects.filter(full_address=address)
+    # TODO: Dedupe
+    if address.count() >= 1:
+        return JsonResponse(address.first().json_response())
+    return JsonResponse({'success': False,
+                         'message': 'Could not get an exact match for {}'.format(address)
+                         })

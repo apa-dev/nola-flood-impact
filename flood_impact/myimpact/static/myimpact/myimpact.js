@@ -31,6 +31,7 @@ form.onsubmit = function(e) {
 var delayTimer = null;
 function delaySearch(text) {
 
+    // clear out the existing datalist
     while (dataList.firstChild) {
         dataList.removeChild(dataList.firstChild)
     }
@@ -68,8 +69,7 @@ function getImpact(address) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
-            resp = JSON.parse(xhr.response);
-            console.log(resp);
+            var resp = JSON.parse(xhr.response);
             if (resp.success) {
                 for (var k in resp.result) {
                     document.getElementById(k).innerHTML = resp.result[k];

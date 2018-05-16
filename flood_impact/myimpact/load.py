@@ -30,9 +30,9 @@ def parcels():
 
 def building_footprints():
     fps = SocrataCatalogItem.objects.get(title='Building Footprint')
-    # url, extension = fps.get_distribution_type_url('Shapefile')
-    # fps.download_distribution(url, extension)
-    # fps.extract_zip(fps.orig_file_loc)
+    url, extension = fps.get_distribution_type_url('Shapefile')
+    fps.download_distribution(url, extension)
+    fps.extract_zip(fps.orig_file_loc)
     fps_shp = fps.get_staged_file_path(extension='shp')
 
     fps_mapping = {
@@ -53,9 +53,9 @@ def building_footprints():
 
 def zoning_districts():
     zds = SocrataCatalogItem.objects.get(title='Zoning District')
-    # url, extension = zds.get_distribution_type_url('Shapefile')
-    # zds.download_distribution(url, extension)
-    # zds.extract_zip(zds.orig_file_loc)
+    url, extension = zds.get_distribution_type_url('Shapefile')
+    zds.download_distribution(url, extension)
+    zds.extract_zip(zds.orig_file_loc)
     zds_shp = zds.get_staged_file_path(extension='shp')
 
     zds_mapping = {
@@ -121,3 +121,12 @@ def site_address_points():
             transform=False, encoding='iso-8859-1',
             )
     lm.save(strict=True, verbose=True)
+
+
+def load_all():
+    print("Loading addresses, building footprints, parcels, and zoning districts "
+          "from https://data.nola.gov. Please be patient, this may take several minutes...")
+    site_address_points()
+    building_footprints()
+    parcels()
+    zoning_districts()
