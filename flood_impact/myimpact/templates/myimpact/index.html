@@ -1,0 +1,52 @@
+<!doctype html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>NOLA Flood Impact</title>
+
+        {% load static %}
+
+    </head>
+
+    <body>
+
+        <form method="" action="" onkeyup="delaySearch(this.value)" id="address-search-form">
+            <input type="text" id="address-search" list="address-list" />
+            <button type="submit" value="submit">Submit</button>
+            <datalist id="address-list"></datalist>
+        </form>
+
+        <div id="flood-calculation-data">
+            <ul>
+                <li>
+                    <span class="value" id="address"></span>
+                </li>
+                <li>Parcel PIN:
+                    <span class="value" id="parcel_geopin"></span>
+                </li>
+                <li>Non-building area (ft<sup>2</sup>):
+                    <span class="value" id="non_building_area"></span>
+                </li>
+                <li>Zoning Description:
+                    <span class="value" id="zoning_description"></span>
+                </li>
+                <li>Cover Type:
+                    <span class="value" id="cover_type"></span>
+                </li>
+                <li>Runoff Curve Number:
+                    <span class="value" id="runoff_curve_number"></span>
+                </li>
+                <li>Soil Retention:
+                    <span class="value" id="soil_retention"></span>
+                </li>
+                <li>Runoff Volume (ft<sup>3</sup>):
+                    <span class="value" id="runoff_volume"></span>
+                </li>
+            </ul>
+        </div>
+
+        <script src="{% static "myimpact/myimpact.js" %}"></script>
+
+    </body>
+</html>

@@ -2,7 +2,7 @@ import json
 import os
 
 from django.conf import settings
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import TemplateView, FormView
 
@@ -20,7 +20,7 @@ class MyImpactResponse(TemplateView):
 
 
 def index(request):
-    return HttpResponse('NOLA MyImpact')
+    return render(request, 'myimpact/index.html')
 
 
 def get_address(request):
@@ -46,7 +46,7 @@ def address_list(request):
     # addresses = list(SiteAddressPoint.objects.values_list('full_address', flat=True)
     #                                          .distinct('full_address'))
     addresses = json.load(open(
-        os.path.join(settings.BASE_DIR, 'myimpact/templates/myimpact/addresses.json')
+        os.path.join(settings.BASE_DIR, 'myimpact/static/myimpact/addresses.json')
         ))
     return JsonResponse(addresses, safe=False)
 
@@ -69,4 +69,4 @@ def address_search(request):
 def address_detail(request, address):
     """Display the address detail view"""
     address = get_object_or_404(SiteAddressPoint, full_address=address)
-    return JsonResponse(address.impact_calculator())
+    return JsonResponse(address.json_response())

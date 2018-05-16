@@ -124,9 +124,13 @@ class SiteAddressPoint(models.Model):
                     )
         return next(x for x in settings.COVER_TYPES if x[0] == zoning_cover_type)
 
-    def impact_calculator(self, rainfall=1.5):
+    def json_response(self, rainfall=1.5):
         cover_type = self.get_cover_type()
         parcel = self.get_containing_parcel()
+        zone_description = 'Unknown'
+        zoning = self.get_zoning()
+        if zoning is not None:
+            zone_description = zoning.zone_description
         if parcel is not None:
             area = parcel.non_building_area['area']
             calculator = FloodImpactCalculator(cover_type=cover_type[0],
@@ -134,9 +138,16 @@ class SiteAddressPoint(models.Model):
                                                rainfall=rainfall)
             return {
                     'success': True,
-                    'runoff_curve_number': calculator.runoff_curve_number,
-                    'soil_retention': calculator.soil_retention,
-                    'runoff_volume': calculator.calc_runoff_volume()
+                    'result': {
+                        'runoff_curve_number': calculator.runoff_curve_number,
+                        'soil_retention': calculator.soil_retention,
+                        'runoff_volume': calculator.calc_runoff_volume(),
+                        'address': self.full_address,
+                        'zoning_description': zone_description,
+                        'cover_type': cover_type[1],
+                        'parcel_geopin': parcel.geopin,
+                        'non_building_area': area
+                        }
                     }
         return {
                 'success': False,
@@ -192,7 +203,8 @@ class Parcel(models.Model):
             django.contrib.gis.geos.collections.MultiPolygon
         """
         building_intersection = self.get_building_intersection()
-        return self.the_geom.difference(building_intersection)
+        if building_intersection is not None:
+            return self.the_geom.difference(building_intersection)
 
     @property
     def non_building_area(self):
@@ -201,8 +213,15 @@ class Parcel(models.Model):
         Returns:
             dict
         """
-        area = self.get_non_building_geometry().transform(settings.LOUISIANA_SOUTH_EPSG, clone=True).area
-        return {"area": area, "units": "square feet"}
+        geom = self.get_non_building_geometry()
+        if geom is None:
+            return {
+                    "area": self.the_geom.transform(settings.LOUISIANA_SOUTH_EPSG, clone=True).area,
+                    "units": "square feet"
+                    }
+        else:
+            area = self.get_non_building_geometry().transform(settings.LOUISIANA_SOUTH_EPSG, clone=True).area
+            return {"area": area, "units": "square feet"}
 
 
 class BuildingFootprint(models.Model):
