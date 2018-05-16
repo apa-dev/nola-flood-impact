@@ -10,6 +10,12 @@
     </head>
 
     <body>
+        <h1>NOLA Flood Impact</h1>
+        <h2>How can you reduce your NOLA water impact?</h2>
+
+        <p>How much stormwater runoff would your property create with 1.5 inches of rainfall? See <a href="https://en.wikipedia.org/wiki/Runoff_curve_number" target="_blank">the Wikipedia article on Runoff curve number</a> for more information.</p>
+
+        <p>Search for your address (the search box will suggest matches as you type)</p>
 
         <form method="" action="" onkeyup="delaySearch(this.value)" id="address-search-form">
             <input type="text" id="address-search" list="address-list" />
@@ -19,29 +25,38 @@
 
         <div id="flood-calculation-data">
             <ul>
-                <li>
+                <li>Address:
                     <span class="value" id="address"></span>
                 </li>
                 <li>Parcel PIN:
                     <span class="value" id="parcel_geopin"></span>
                 </li>
-                <li>Non-building area (ft<sup>2</sup>):
-                    <span class="value" id="non_building_area"></span>
-                </li>
                 <li>Zoning Description:
                     <span class="value" id="zoning_description"></span>
                 </li>
-                <li>Cover Type:
-                    <span class="value" id="cover_type"></span>
+                <li>Non-building area (ft<sup>2</sup>):
+                    <span class="value" id="non_building_area"></span>
                 </li>
-                <li>Runoff Curve Number:
-                    <span class="value" id="runoff_curve_number"></span>
+                <li>Building area (ft<sup>2</sup>):
+                    <span class="value" id="building_area"></span>
                 </li>
-                <li>Soil Retention:
-                    <span class="value" id="soil_retention"></span>
+                <li>Non-building Cover Type:
+                    <span class="value" id="non_building_cover_type"></span>
                 </li>
-                <li>Runoff Volume (ft<sup>3</sup>):
-                    <span class="value" id="runoff_volume"></span>
+                <li>Non-building Runoff Curve Number:
+                    <span class="value" id="non_building_runoff_curve_number"></span>
+                </li>
+                <li>Non-building Soil Retention (inches):
+                    <span class="value" id="non_building_soil_retention"></span>
+                </li>
+                <li>Non-building Runoff Volume (ft<sup>3</sup>):
+                    <span class="value" id="non_building_runoff_volume"></span>
+                </li>
+                <li>Building Runoff Volume (ft<sup>3</sup>):
+                    <span class="value" id="building_runoff_volume"></span>
+                </li>
+                <li>Total Runoff Volume (ft<sup>3</sup>):
+                    <span class="value" id="total_runoff_volume"></span>
                 </li>
             </ul>
         </div>

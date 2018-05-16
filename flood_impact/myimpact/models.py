@@ -124,6 +124,31 @@ class SiteAddressPoint(models.Model):
                     )
         return next(x for x in settings.COVER_TYPES if x[0] == zoning_cover_type)
 
+    def create_flood_calculator(self, area_breakdown, rainfall=1.5):
+        """Instantiate FloodImpactCalculator objects, based on the
+        area_breakdown (return value of Parcel.area_breakdown).
+        Non-building area will get the cover_type that maps to its zoning designation
+        Building area will be presumed to be impervious (cover_type = IMPERVIOUS)
+
+        Args:
+            area_breakdown (dict): return value of Parcel.area_breakdown
+        Returns:
+            dict, of myimpact.FloodImpactCalculator, keyed by [non]building area
+        """
+        cover_type = self.get_cover_type()
+        non_building_area = area_breakdown['totals']['non_building']
+        building_area = area_breakdown['totals']['building']
+        calc_non_building_area = FloodImpactCalculator(cover_type=cover_type[0],
+                                                       area_square_feet=non_building_area,
+                                                       rainfall=rainfall)
+        calc_building_area = FloodImpactCalculator(cover_type="IMPERVIOUS",
+                                                   area_square_feet=building_area,
+                                                   rainfall=rainfall)
+        return {
+                'building': calc_building_area,
+                'non_building': calc_non_building_area
+                }
+
     def json_response(self, rainfall=1.5):
         cover_type = self.get_cover_type()
         parcel = self.get_containing_parcel()
@@ -132,21 +157,24 @@ class SiteAddressPoint(models.Model):
         if zoning is not None:
             zone_description = zoning.zone_description
         if parcel is not None:
-            area = parcel.non_building_area['area']
-            calculator = FloodImpactCalculator(cover_type=cover_type[0],
-                                               area_square_feet=area,
-                                               rainfall=rainfall)
+            calculator = self.create_flood_calculator(parcel.area_breakdown, rainfall)
+            cnb = calculator['non_building']
+            cb = calculator['building']
             return {
                     'success': True,
                     'result': {
-                        'runoff_curve_number': calculator.runoff_curve_number,
-                        'soil_retention': calculator.soil_retention,
-                        'runoff_volume': calculator.calc_runoff_volume(),
                         'address': self.full_address,
-                        'zoning_description': zone_description,
-                        'cover_type': cover_type[1],
                         'parcel_geopin': parcel.geopin,
-                        'non_building_area': area
+                        'zoning_description': zone_description,
+                        'non_building_area': round(cnb.area_square_feet, 1),
+                        'building_area': round(cb.area_square_feet, 1),
+                        'non_building_cover_type': cover_type[1],
+                        'non_building_runoff_curve_number': cnb.runoff_curve_number,
+                        'non_building_soil_retention': round(cnb.soil_retention, 1),
+                        'non_building_runoff_volume': round(cnb.calc_runoff_volume(), 1),
+                        'building_runoff_volume': round(cb.calc_runoff_volume(), 1),
+                        'total_runoff_volume': round(cnb.calc_runoff_volume() +
+                                                     cb.calc_runoff_volume(), 1)
                         }
                     }
         return {
@@ -207,21 +235,36 @@ class Parcel(models.Model):
             return self.the_geom.difference(building_intersection)
 
     @property
-    def non_building_area(self):
+    def area_breakdown(self):
         """Get the non-building area of this parcel in square feet
 
         Returns:
             dict
         """
-        geom = self.get_non_building_geometry()
-        if geom is None:
+        non_building_geom = self.get_non_building_geometry()
+        if non_building_geom is not None:
+            non_building_area = non_building_geom.transform(
+                    settings.LOUISIANA_SOUTH_EPSG, clone=True).area
+            building_area = self.the_geom.transform(
+                    settings.LOUISIANA_SOUTH_EPSG, clone=True).area - non_building_area
             return {
-                    "area": self.the_geom.transform(settings.LOUISIANA_SOUTH_EPSG, clone=True).area,
+                    "totals": {
+                        "non_building": non_building_area,
+                        "building": building_area
+                        },
                     "units": "square feet"
                     }
         else:
-            area = self.get_non_building_geometry().transform(settings.LOUISIANA_SOUTH_EPSG, clone=True).area
-            return {"area": area, "units": "square feet"}
+            # No buildings on the parcel, so just use the entire parcel area
+            non_building_area = self.the_geom.transform(
+                    settings.LOUISIANA_SOUTH_EPSG, clone=True).area
+            return {
+                    "totals": {
+                        "non_building": non_building_area,
+                        "building": 0
+                        },
+                    "units": "square feet"
+                    }
 
 
 class BuildingFootprint(models.Model):
