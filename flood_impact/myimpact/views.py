@@ -5,6 +5,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.generic import TemplateView, FormView
+from django.views.decorators.csrf import csrf_exempt
 
 from myimpact.forms import AddressForm
 from myimpact.models import SiteAddressPoint
@@ -51,6 +52,8 @@ def address_list(request):
     return JsonResponse(addresses, safe=False)
 
 
+# DJANGO...Y U NO SET COOKIE?
+@csrf_exempt
 def address_search(request):
     """Search for an address"""
 
