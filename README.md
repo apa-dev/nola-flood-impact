@@ -6,6 +6,10 @@ This is a continuation of a project that was started at a [Data Jam session at t
 
 The project is written in [GeoDjango](https://docs.djangoproject.com/en/2.0/ref/contrib/gis/), a geospatial extension to the Django web framework.
 
+### Environment Variables
+
+Copy `example.env` to `.env` and edit accordingly.
+
 ### Virtual Environment
 
 Create a virtual environment using your preferred method. There is a `Pipfile`, so if you have [pipenv](https://docs.pipenv.org/) installed, you could do:
