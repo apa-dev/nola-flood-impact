@@ -36,6 +36,13 @@ If all goes well, you should have a PostGIS instance accessible on your `localho
 $ python manage.py migrate
 ```
 
+### Create Superuser
+
+```bash
+$ python manage.py createsuperuser
+```
+
+
 ### ETL required datasets
 
 The project requires several datasets from [NOLA Open Data](https://data.nola.gov), specifically:
