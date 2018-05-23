@@ -57,6 +57,9 @@ function delaySearch(text) {
         }
 
         xhr.open("POST", "/myimpact/address_search/", true);
+        // FIXME: Occasionally document.cookie is an empty string,
+        // need to figure out why. Making this view CSRF-exempt in
+        // Django for now.
         xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
         xhr.setRequestHeader("Content-Type", "application/json");
 
@@ -72,7 +75,10 @@ function getImpact(address) {
             var resp = JSON.parse(xhr.response);
             if (resp.success) {
                 for (var k in resp.result) {
-                    document.getElementById(k).innerHTML = resp.result[k];
+                    var elem = document.getElementById(k);
+                    if (elem) {
+                        elem.innerHTML = resp.result[k];
+                    }
                 }
             }
         }
