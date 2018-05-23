@@ -1,5 +1,7 @@
 # NOLA Flood Impact
 
+![screenshot of city hall in app](https://raw.githubusercontent.com/apa-dev/nola-flood-impact/my-impact-calculator/screenshots/city_hall.png)
+
 This is a continuation of a project that was started at a [Data Jam session at the 2018 National Planning Conference in New Orleans](https://planning.org/conference/datajam/), where the main topic was climate change and stormwater management in New Orleans. This is the main software repository for that DataJam.
 
 ## Getting Started
