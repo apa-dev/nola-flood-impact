@@ -7,59 +7,76 @@
 
         {% load static %}
 
+        <!-- Bootstrap v4.1.1 -->
+        <link rel="stylesheet" href="{% static "myimpact/vendor/bootstrap_v411/css/bootstrap.css" %}" />
+
+
     </head>
 
     <body>
-        <h1>NOLA Flood Impact</h1>
-        <h2>How can you reduce your NOLA water impact?</h2>
+        <div class="container">
+            <h1>NOLA Flood Impact</h1>
+            <h2>How can you reduce your NOLA water impact?</h2>
 
-        <p>How much stormwater runoff would your property create with 1.5 inches of rainfall? See <a href="https://en.wikipedia.org/wiki/Runoff_curve_number" target="_blank">the Wikipedia article on Runoff curve number</a> for more information.</p>
+            <div class="row">
+                <p>How much stormwater runoff would your property create with 1.5 inches of rainfall? See <a href="https://en.wikipedia.org/wiki/Runoff_curve_number" target="_blank">the Wikipedia article on Runoff curve number</a> for more information.</p>
 
-        <p>Search for your address (the search box will suggest matches as you type)</p>
+                <p>Search for your address (the search box will suggest matches as you type)</p>
+            </div> <!-- row -->
 
-        <form method="" action="" onkeyup="delaySearch(this.value)" id="address-search-form">
-            <input type="text" id="address-search" list="address-list" />
-            <button type="submit" value="submit">Submit</button>
-            <datalist id="address-list"></datalist>
-        </form>
+            <div class="row">
+                <form method="" action="" onkeyup="delaySearch(this.value)" id="address-search-form">
+                    <input type="text" id="address-search" list="address-list" />
+                    <button type="submit" value="submit">Submit</button>
+                    <datalist id="address-list"></datalist>
+                </form>
+            </div> <!-- row -->
 
-        <div id="flood-calculation-data">
-            <ul>
-                <li>Address:
-                    <span class="value" id="address"></span>
-                </li>
-                <li>Parcel PIN:
-                    <span class="value" id="parcel_geopin"></span>
-                </li>
-                <li>Zoning Description:
-                    <span class="value" id="zoning_description"></span>
-                </li>
-                <li>Non-building area (ft<sup>2</sup>):
-                    <span class="value" id="non_building_area"></span>
-                </li>
-                <li>Building area (ft<sup>2</sup>):
-                    <span class="value" id="building_area"></span>
-                </li>
-                <li>Non-building Cover Type:
-                    <span class="value" id="non_building_cover_type"></span>
-                </li>
-                <li>Non-building Runoff Curve Number:
-                    <span class="value" id="non_building_runoff_curve_number"></span>
-                </li>
-                <li>Non-building Soil Retention (inches):
-                    <span class="value" id="non_building_soil_retention"></span>
-                </li>
-                <li>Non-building Runoff Volume (ft<sup>3</sup>):
-                    <span class="value" id="non_building_runoff_volume"></span>
-                </li>
-                <li>Building Runoff Volume (ft<sup>3</sup>):
-                    <span class="value" id="building_runoff_volume"></span>
-                </li>
-                <li>Total Runoff Volume (ft<sup>3</sup>):
-                    <span class="value" id="total_runoff_volume"></span>
-                </li>
-            </ul>
-        </div>
+            <div class="row">
+                <div id="flood-calculation-data">
+                    <div class="col">
+                        <ul>
+                            <li>Address:
+                                <span class="value" id="address"></span>
+                            </li>
+                            <li>Parcel PIN:
+                                <span class="value" id="parcel_geopin"></span>
+                            </li>
+                            <li>Zoning Description:
+                                <span class="value" id="zoning_description"></span>
+                            </li>
+                            <li>Non-building area (ft<sup>2</sup>):
+                                <span class="value" id="non_building_area"></span>
+                            </li>
+                            <li>Building area (ft<sup>2</sup>):
+                                <span class="value" id="building_area"></span>
+                            </li>
+                            <li>Non-building Cover Type:
+                                <span class="value" id="non_building_cover_type"></span>
+                            </li>
+                            <li>Non-building Runoff Curve Number:
+                                <span class="value" id="non_building_runoff_curve_number"></span>
+                            </li>
+                            <li>Non-building Soil Retention (inches):
+                                <span class="value" id="non_building_soil_retention"></span>
+                            </li>
+                            <li>Non-building Runoff Volume (ft<sup>3</sup>):
+                                <span class="value" id="non_building_runoff_volume"></span>
+                            </li>
+                            <li>Building Runoff Volume (ft<sup>3</sup>):
+                                <span class="value" id="building_runoff_volume"></span>
+                            </li>
+                            <li>Total Runoff Volume (ft<sup>3</sup>):
+                                <span class="value" id="total_runoff_volume"></span>
+                            </li>
+                        </ul>
+                    </div> <!-- col -->
+                    <div class="col">
+                        <p>Map goes here</p>
+                    </div> <!-- col -->
+                </div> <!-- flood-calculation-data -->
+            </div> <!-- row -->
+        </div> <!-- container -->
 
         <script src="{% static "myimpact/myimpact.js" %}"></script>
 
