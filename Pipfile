@@ -8,7 +8,7 @@ django = "*"
 "argon2-cffi" = "*"
 bcrypt = "*"
 "psycopg2-binary" = "*"
-sodapy = "*"
+djangorestframework-gis = "*"
 
 [dev-packages]
 sphinx = "*"

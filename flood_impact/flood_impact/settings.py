@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'django.contrib.postgres',
+    'rest_framework',
+    'rest_framework_gis',
     'etl',
     'myimpact'
 ]

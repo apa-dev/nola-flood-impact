@@ -6,10 +6,6 @@ This is a continuation of a project that was started at a [Data Jam session at t
 
 The project is written in [GeoDjango](https://docs.djangoproject.com/en/2.0/ref/contrib/gis/), a geospatial extension to the Django web framework.
 
-### Environment Variables
-
-Copy `example.env` to `.env` and edit accordingly.
-
 ### Virtual Environment
 
 Create a virtual environment using your preferred method. There is a `Pipfile`, so if you have [pipenv](https://docs.pipenv.org/) installed, you could do:
@@ -39,13 +35,6 @@ If all goes well, you should have a PostGIS instance accessible on your `localho
 ```bash
 $ python manage.py migrate
 ```
-
-### Create Superuser
-
-```bash
-$ python manage.py createsuperuser
-```
-
 
 ### ETL required datasets
 
@@ -88,3 +77,20 @@ You should now be able to access the proof-of-concept web form at http://localho
 ```bash
 $ python manage.py runserver 0.0.0.0:8181
 ```
+
+## Known Issues
+
+### Performance
+
+* The autocomplete address dropdown [datalist](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/datalist) that suggests addresses as the user types could use some performance optimization. It uses the `full_address` field on the `SiteAddressPoint` model, which contains condominium units, if present, in one building. Those are unnecessary given that we only need the parcel and the building footprint. Using a combination of the `address_number` and `full_name` fields would reduce the amount of rows the ORM has to [search with PostgreSQL full text search](https://docs.djangoproject.com/en/2.0/ref/contrib/postgres/search/) 
+
+### Usability
+
+* The address entered in the search form must be an exact match to a `full_address` value in `SiteAddressPoint` - there is no fuzzy string matching or ranking. That is one reason for the autosuggset drop down. A user could enter a valid address, but if the `full_address` has "South" for an address direction and the user simply enters "S" it would not match
+* Speaking of, the front-end currently does not display any error message if there is no exact match, it simply does nothing.
+
+### Security
+
+* [CSRF protection](https://docs.djangoproject.com/en/2.0/ref/csrf/) was disabled on the view for `/myimpact/address`, as Django was occasionally not setting a `document.cookie` during development, making it impossible to include a CSRF token with the `POST` request.
+* The [Mapbox access token](https://www.mapbox.com/help/define-access-token/) is exposed. It's a public, read-only token associated with an account on the free tier, [limited to 50,000 views per month](https://www.mapbox.com/pricing/)
+* Speaking of security, it is highly recommended to go through the [Django deployment checklist](https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/) before even considering deploying this on a public-facing site.

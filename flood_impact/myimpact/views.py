@@ -4,16 +4,13 @@ import os
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.views.generic import TemplateView, FormView
+from django.views.generic import TemplateView
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework import viewsets
 
 from myimpact.forms import AddressForm
 from myimpact.models import SiteAddressPoint
-
-
-class AddressFormView(FormView):
-    template_name = 'myimpact/myimpact.html'
-    form_class = AddressForm
+from myimpact.serializers import SiteAddressPointSerializer
 
 
 class MyImpactResponse(TemplateView):
@@ -22,18 +19,6 @@ class MyImpactResponse(TemplateView):
 
 def index(request):
     return render(request, 'myimpact/index.html')
-
-
-def get_address(request):
-    # if request.method == "POST":
-    #     form = AddressForm(request.POST)
-    #     if form.is_valid():
-    #         return HttpResponse('nice address!')
-    # else:
-    #     form = AddressForm()
-
-    # return render(request, 'myimpact/myimpact.html', {'form': form})
-    return render(request, 'myimpact/datalist.html')
 
 
 def address_list(request):
@@ -79,3 +64,8 @@ def address_detail(request, address):
     return JsonResponse({'success': False,
                          'message': 'Could not get an exact match for {}'.format(address)
                          })
+
+
+# class SiteAddressPointViewset(viewsets.ModelViewSet):
+#     queryset = SiteAddressPoint.objects.all()
+#     serializer_class = SiteAddressPointSerializer

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 
 from django.conf import settings
 from django.contrib.gis.db import models
@@ -174,7 +175,9 @@ class SiteAddressPoint(models.Model):
                         'non_building_runoff_volume': round(cnb.calc_runoff_volume(), 1),
                         'building_runoff_volume': round(cb.calc_runoff_volume(), 1),
                         'total_runoff_volume': round(cnb.calc_runoff_volume() +
-                                                     cb.calc_runoff_volume(), 1)
+                                                     cb.calc_runoff_volume(), 1),
+                        "geojson": parcel.geojson_response(),
+                        "center": parcel.centroid
                         }
                     }
         return {
@@ -233,6 +236,54 @@ class Parcel(models.Model):
         building_intersection = self.get_building_intersection()
         if building_intersection is not None:
             return self.the_geom.difference(building_intersection)
+
+    @property
+    def centroid(self):
+        return list(self.the_geom.centroid)
+
+    @property
+    def geom_geojson(self):
+        """Return the Parcel geometry as GeoJSON"""
+        return json.loads(self.the_geom.json)
+
+    @property
+    def building_intersection_geojson(self):
+        """Get the total building geometry intersection on this Parcel"""
+        buildings = self.get_building_intersection()
+        if buildings:
+            return json.loads(buildings.json)
+
+    @property
+    def non_building_geometry_geojson(self):
+        """Get the non-building geometry as GeoJSON"""
+        nbg = self.get_non_building_geometry()
+        if nbg:
+            return json.loads(nbg.json)
+
+    def geojson_response(self):
+        """Create individual GeoJSON objects of the parcel itself and [non]building geometry"""
+        resp = {
+                "parcel": {
+                    "type": "Feature",
+                    "id": self.pk,
+                    "properties": {
+                        "area": self.area_breakdown,
+                        "geopin": self.geopin
+                        },
+                    "geometry": self.geom_geojson
+                    },
+                "building": {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": self.building_intersection_geojson or {}
+                    },
+                "nonbuilding": {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": self.non_building_geometry_geojson or {}
+                    }
+                }
+        return resp
 
     @property
     def area_breakdown(self):
