@@ -1,6 +1,7 @@
 from django.contrib.gis.utils import LayerMapping
 
 from etl.models import SocrataCatalogItem
+from etl.tasks import save_nola_catalog
 from myimpact.models import BuildingFootprint, Parcel, SiteAddressPoint, ZoningDistrict
 
 
@@ -114,6 +115,9 @@ def site_address_points():
             }
 
     site_address_points = SocrataCatalogItem.objects.get(title='Site Address Point')
+    url, extension = site_address_points.get_distribution_type_url('Shapefile')
+    site_address_points.download_distribution(url, extension)
+    site_address_points.extract_zip(site_address_points.orig_file_loc)
     site_address_points_shp = site_address_points.get_staged_file_path(extension='shp')
 
     lm = LayerMapping(
@@ -126,6 +130,7 @@ def site_address_points():
 def load_all():
     print("Loading addresses, building footprints, parcels, and zoning districts "
           "from https://data.nola.gov. Please be patient, this may take several minutes...")
+    save_nola_catalog()
     site_address_points()
     building_footprints()
     parcels()
