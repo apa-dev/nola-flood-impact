@@ -9,7 +9,6 @@ django = "*"
 bcrypt = "*"
 "psycopg2-binary" = "*"
 sodapy = "*"
-djangorestframework-gis = "*"
 
 [dev-packages]
 sphinx = "*"

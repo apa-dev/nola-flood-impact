@@ -2,7 +2,6 @@ from django.urls import path
 
 from myimpact import views
 
-
 urlpatterns = [
         path('', views.index, name='index'),
         path('address_list/', views.address_list, name='address_list'),

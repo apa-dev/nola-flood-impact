@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "5f390fe8586a2dfaf0c8f852702b134416a084983819aa87813b8837c9d1376b"
+            "sha256": "4d5d738e5e5d21b67cd1d48e7d55233af76c9c17d9c53d1ad560085891b0ef0f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -133,21 +133,6 @@
             ],
             "index": "pypi",
             "version": "==2.0.5"
-        },
-        "djangorestframework": {
-            "hashes": [
-                "sha256:b6714c3e4b0f8d524f193c91ecf5f5450092c2145439ac2769711f7eba89a9d9",
-                "sha256:c375e4f95a3a64fccac412e36fb42ba36881e52313ec021ef410b40f67cddca4"
-            ],
-            "version": "==3.8.2"
-        },
-        "djangorestframework-gis": {
-            "hashes": [
-                "sha256:018200f8ac8e4babd04001e86ce8df5ad86057d1e7438558b7c9ce24b532ea20",
-                "sha256:94901389f32f0b8cdd1133e581f81c745c903449a08c2ddff0fcb2645cca846c"
-            ],
-            "index": "pypi",
-            "version": "==0.13"
         },
         "future": {
             "hashes": [
@@ -375,10 +360,10 @@
         },
         "parso": {
             "hashes": [
-                "sha256:62bd6bf7f04ab5c817704ff513ef175328676471bdef3629d4bdd46626f75551",
-                "sha256:a75a304d7090d2c67bd298091c14ef9d3d560e3c53de1c239617889f61d1d307"
+                "sha256:cdef26e8adc10d589f3ec4eb444bd0a29f3f1eb6d72a4292ab8afcb9d68976a6",
+                "sha256:f0604a40b96e062b0fd99cf134cc2d5cdf66939d0902f8267d938b0d5b26707f"
             ],
-            "version": "==0.2.0"
+            "version": "==0.2.1"
         },
         "pathtools": {
             "hashes": [
