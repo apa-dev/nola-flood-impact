@@ -27,7 +27,7 @@ The project uses [PostGIS](http://postgis.net) as the database. Installing PostG
 $ docker run --name nola-postgis \
               -e POSTGRES_USER=nola \
               -e POSTGRES_DATABASE=nola \
-              -e POSTGRES_PASSWORD=nola
+              -e POSTGRES_PASSWORD=nola \
               -p 5432:5432 \
               mdillon/postgis:10
 ```
