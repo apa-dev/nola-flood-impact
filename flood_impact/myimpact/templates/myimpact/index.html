@@ -1,0 +1,80 @@
+<!doctype html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>NOLA Flood Impact</title>
+
+        {% load static %}
+
+        <!-- Bootstrap v4.1.1 -->
+        <link rel="stylesheet" href="{% static "myimpact/vendor/bootstrap_v411/css/bootstrap.css" %}" />
+
+        <!-- Mapbox v0.45.0 -->
+        <link rel="stylesheet" href="{% static "myimpact/vendor/mapbox_v0450/css/mapbox-gl.css" %}" />
+        <script src="{% static "myimpact/vendor/mapbox_v0450/js/mapbox-gl.js" %}"></script>
+
+
+    </head>
+
+    <body>
+        <div class="container">
+            <h1>NOLA Flood Impact</h1>
+            <h2>How can you reduce your NOLA water impact?</h2>
+
+            <div class="row">
+                <p>How much stormwater runoff would your property create with 1.5 inches of rainfall? See <a href="https://en.wikipedia.org/wiki/Runoff_curve_number" target="_blank">the Wikipedia article on Runoff curve number</a> for more information.</p>
+
+                <p>Search for your address (the search box will suggest matches as you type)</p>
+            </div> <!-- row -->
+
+            <div class="row">
+                <form method="" action="" onkeyup="delaySearch(this.value)" id="address-search-form">
+                    <input type="text" id="address-search" list="address-list" />
+                    <button type="submit" value="submit">Submit</button>
+                    <datalist id="address-list"></datalist>
+                </form>
+            </div> <!-- row -->
+
+            <div class="row">
+                <div class="col">
+                    <dt>Parcel PIN</dt>
+                    <dd id="parcel_geopin"></dd>
+
+                    <dt>Zoning Description</dt>
+                    <dd id="zoning_description"></dd>
+
+                    <dt>Non-building area (ft<sup>2</sup>)</dt>
+                    <dd id="non_building_area"></dd>
+
+                    <dt>Building area (ft<sup>2</sup>)</dt>
+                    <dd id="building_area"></dd>
+
+                    <dt>Non-building Cover Type</dt>
+                    <dd id="non_building_cover_type"></dd>
+
+                    <dt>Non-building Runoff Curve Number</dt>
+                    <dd id="non_building_runoff_curve_number"></dd>
+
+                    <dt>Non-building Soil Retention (inches)</dt>
+                    <dd id="non_building_soil_retention"></dd>
+
+                    <dt>Non-building Runoff Volume (ft<sup>3</sup>)</dt>
+                    <dd id="non_building_runoff_volume"></dd>
+
+                    <dt>Building Runoff Volume (ft<sup>3</sup>)</dt>
+                    <dd id="building_runoff_volume"></dd>
+
+                    <dt>Total Runoff Volume (ft<sup>3</sup>)</dt>
+                    <dd id="total_runoff_volume"></dd>
+                </div>
+                <div class="col">
+                    <div id="map" style="width: 400px; height: 300px;"></div>
+                </div>
+            </div>
+        </div> <!-- container -->
+
+        <script src="{% static "myimpact/myimpact.js" %}"></script>
+
+    </body>
+</html>

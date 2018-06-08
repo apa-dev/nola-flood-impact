@@ -1,0 +1,5 @@
+# vim: ft=dosini
+
+[flake8]
+max-line-length = 120
+exclude = .git,__pycache__,migrations,flood_impact/etl/data_config/*,flood_impact/flood_impact/settings.py

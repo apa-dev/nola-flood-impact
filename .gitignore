@@ -2,6 +2,15 @@
 *.sublime-workspace
 *.sublime-project
 
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# vim
+*.sw[op]
+
+# PyCharm
+.idea
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -107,3 +116,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+flood_impact/etl/datastore/orig/
+flood_impact/etl/datastore/staging/
