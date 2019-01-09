@@ -10,6 +10,7 @@ bcrypt = "*"
 "psycopg2-binary" = "*"
 djangorestframework-gis = "*"
 requests = "*"
+pyyaml = ">=4"
 
 [dev-packages]
 sphinx = "*"
