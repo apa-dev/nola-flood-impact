@@ -119,3 +119,5 @@ venv.bak/
 
 flood_impact/etl/datastore/orig/
 flood_impact/etl/datastore/staging/
+
+.autoenv*.zsh
