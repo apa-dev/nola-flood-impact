@@ -2,10 +2,15 @@ import os
 import re
 import zipfile
 
+import geopandas as gpd
+import pandas as pd
+from shapely import wkt
+import numpy as np
+
 import requests
 from django.conf import settings
 from django.contrib.gis.db import models
-from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 from django.utils import timezone
 
 from etl.data_config import socrata as socrata_config
@@ -53,15 +58,16 @@ class SocrataCatalogItem(models.Model):
         Returns:
             tuple: (str: URL, str: file extension)
         """
-
         if not self.distribution:
-            return
+            return (None, None)
         pattern = re.compile('format={}$'.format(type_))
         for dist in self.distribution:
+            downloadURL = dist.get('downloadURL', '')
             search = pattern.search(dist.get('downloadURL', ''),
                                     re.IGNORECASE)
             if search is not None:
                 return search.string, socrata_config.MIME_EXTENSIONS.get(dist['mediaType'], '')
+            return downloadURL, socrata_config.MIME_EXTENSIONS.get(dist['mediaType'], '')
 
     def get_distribution_types(self):
         """Get all the format=<type> values for the distribution.
@@ -178,6 +184,9 @@ class SocrataCatalogItem(models.Model):
                                socrata_config)
         Returns:
             list: The list of paths to the extracted files
+        NOTE:
+        nola.gov data used to be offered in shapefile format, hence the need to extract files from a zip
+        this is no longer the case; it is now offered in csv, rdf, json or xml formats
         """
         if extract_dir is None:
             extract_dir = os.path.join(socrata_config.DATASTORE,
@@ -190,5 +199,49 @@ class SocrataCatalogItem(models.Model):
             zf.extractall(path=extract_dir)
             return [os.path.join(extract_dir, x) for x in zf.namelist()]
         except Exception as exc:
-            print('Unable to unzip {}'.format(path))
-            print('Error was: {}'.format(exc.__str__()))
+            # if extract fails, Convert the CSV to a Shapefile and save it in staging
+            csvfile = path
+            shapefile = extract_dir + '/sci_{}'.format(self.pk) + '.shp'
+            self.csv_to_shp(csvfile, shapefile)
+            shp_file_paths = [os.path.join(extract_dir, x) for x in os.listdir(extract_dir)
+                  if os.path.isfile(os.path.join(extract_dir, x)) and x.endswith('.shp')]
+            return shp_file_paths
+
+    def csv_to_shp(self, csv_file, shapefile_path):
+        df = pd.read_csv(csv_file)
+        # MUST REFER TO FULL FIELD NAMES HERE (FROM THE CSV):
+        string_columns = ['Site Address ID', 'Full Address Number', 'Address Number Prefix', 'Address Number Suffix', 
+            'Zoning Number', 'Zoning Year']
+        for col in string_columns:
+            if col in df.columns:
+                df[col] = df[col].astype(str)
+        # if path is parcels (sci_188) then we need to convert geopin to string
+        if shapefile_path.find('sci_188') >= 0:
+            string_columns = ['GEOPIN',]
+            for col in string_columns:
+                if col in df.columns:
+                    df[col] = df[col].astype(str)
+
+        # Check if LAT and LONG columns are present
+        if 'LAT' in df.columns and 'LONG' in df.columns:
+            df_clean = df.dropna(subset=['LAT', 'LONG'])
+            df_clean = df_clean[np.isfinite(df_clean['LAT']) & np.isfinite(df_clean['LONG'])]
+            gdf = gpd.GeoDataFrame(df_clean, geometry=gpd.GeoSeries.from_wkt(df['the_geom']))
+            gdf.set_crs("EPSG:4326", inplace=True)
+
+        elif 'the_geom' in df.columns:
+            df_clean = df[df['the_geom'].apply(lambda x: isinstance(x, str))]
+            geometry = df_clean['the_geom'].apply(wkt.loads)
+            gdf = gpd.GeoDataFrame(df_clean, geometry=geometry)
+            gdf = gdf.dropna(subset=['geometry',])
+
+            if shapefile_path.find('sci_148') >= 0 or shapefile_path.find('sci_188') >= 0:
+                gdf = gdf.dropna(subset=['GEOPIN',])
+
+            gdf.set_crs("EPSG:4326", inplace=True)
+
+        else:
+            raise ValueError("CSV file does not contain 'LAT'/'LONG' columns or a recognized geometry field (e.g., 'the_geom').")
+
+        gdf.to_file(shapefile_path)
+        print(f"Shapefile saved to: {shapefile_path}")

@@ -10,4 +10,4 @@ class MyImpactTestCase(TestCase):
         pass
 
     def test_test_discover(self):
-        self.assertEquals('test', 'test')
+        self.assertEqual('test', 'test')

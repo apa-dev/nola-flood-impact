@@ -86,7 +86,9 @@ DATABASES = {
         'USER': 'nola',
         'PASSWORD': 'nola',
         'HOST': 'localhost',
-        'PORT': 5432
+        # to avoid host machine postgres install (port 5432) conflict. run docker postgis with external port 5442
+        'PORT': 5442
+        # 'PORT': 5432
     }
 }
 

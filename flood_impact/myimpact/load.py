@@ -13,13 +13,12 @@ def parcels():
     parcels_shp = parcels.get_staged_file_path(extension='shp')
 
     parcels_mapping = {
-            'object_id': 'objectid',
-            'shape_area': 'shape_area',
-            'hectares': 'hectares',
-            'acres': 'acres',
-            'perimeter': 'perimeter',
-            'geopin': 'geopin',
-            'shape_length': 'shape_leng',
+            'object_id': 'OBJECTID',
+            'shape_area': 'Shape.STAr',
+            'acres': 'ACRES',
+            'perimeter': 'PERIMETER',
+            'geopin': 'GEOPIN',
+            'shape_length': 'Shape.STLe',
             'the_geom': 'MULTIPOLYGON'
         }
     lm = LayerMapping(
@@ -37,14 +36,12 @@ def building_footprints():
     fps_shp = fps.get_staged_file_path(extension='shp')
 
     fps_mapping = {
-        'num_stories': 'numstories',
-        'shape_length': 'shape_leng',
-        'shape_area': 'shape_area',
-        'feature_code': 'featurecod',
-        'geopin': 'geopin',
-        'object_id': 'objectid',
-        'building_height': 'bldgheight',
+        'shape_length': 'Shape.STLe',
+        'shape_area': 'Shape.STAr',
+        'geopin': 'GEOPIN',
+        'object_id': 'OBJECTID',
         'the_geom': 'MULTIPOLYGON'
+
         }
     lm = LayerMapping(
             BuildingFootprint, fps_shp, fps_mapping, transform=False, encoding='iso-8859-1'
@@ -53,29 +50,20 @@ def building_footprints():
 
 
 def zoning_districts():
-    zds = SocrataCatalogItem.objects.get(title='Zoning District')
+    zds = SocrataCatalogItem.objects.get(title='Zoning Districts')
     url, extension = zds.get_distribution_type_url('Shapefile')
     zds.download_distribution(url, extension)
     zds.extract_zip(zds.orig_file_loc)
     zds_shp = zds.get_staged_file_path(extension='shp')
 
     zds_mapping = {
-            'zone_number': 'zonenum',
-            'created_by': 'created_us',
-            'zone_description': 'zonedesc',
-            'object_id': 'objectid',
-            'zone_year': 'zoneyear',
-            'future_land_use': 'futlanduse',
-            'ordinance_number': 'ordnum',
-            'zone_class': 'zoneclass',
-            'last_edited_by': 'last_edite',
-            'flu_link': 'flu_link',
-            'flu_description': 'flu_desc',
-            'date_last_edited': 'date_last_',
-            'time_last_edited': 'time_last_',
-            'hyperlink': 'hyperlink',
-            'date_created': 'date_creat',
-            'time_created': 'time_creat',
+            'zone_number': 'Zoning Num',
+            'zone_description': 'Zone Descr',
+            'object_id': 'OBJECTID',
+            'zone_year': 'Zoning Yea',
+            'ordinance_number': 'Zoning Ord',
+            'zone_class': 'Zoning Cla',
+            'hyperlink': 'HYPERLINK',
             'the_geom': 'MULTIPOLYGON'
         }
 
@@ -86,31 +74,27 @@ def zoning_districts():
 
 
 def site_address_points():
+
     site_address_point_mapping = {
-            'address_type': 'addr_type',
-            'alt_unit_id': 'altunitid',
-            'source': 'source',
-            'address_number': 'addrnum',
-            'easting': 'long',
-            'full_name': 'fullname',
-            'address_number_suffix': 'addrnumsuf',
-            'object_id': 'objectid',
-            'pre_address_number': 'preaddrnum',
-            'alt_unit_type': 'altunittyp',
-            'capture_method': 'capturemet',
-            'address_range': 'addrrange',
-            'address_point_key': 'addptkey',
-            'status': 'status',
-            'point_type': 'pointtype',
-            'full_address': 'fulladdr',
-            'northing': 'lat',
-            'place_name': 'placename',
-            'unit_type': 'unittype',
-            'municipality': 'municipali',
-            'site_address_id': 'siteaddid',
-            'last_editor': 'lasteditor',
-            'date_last_updated': 'date_lastu',
-            'time_last_updated': 'time_lastu',
+            'address_type': 'ADDR_TYPE',
+            'source': 'Address So',
+            'address_number': 'Full Addre',
+            'easting': 'LONG',
+            'full_name': 'Full Road',
+            'address_number_suffix': 'Address _1',
+            'object_id': 'OBJECTID',
+            'pre_address_number': 'Address Nu',
+            'capture_method': 'Capture Me',
+            'status': 'Status',
+            'point_type': 'Location',
+            'full_address': 'Full Add_1',
+            'northing': 'LAT',
+            'place_name': 'Place Name',
+            'unit_type': 'Address Un',
+            'unit_id': 'Address _2',
+            'site_address_id': 'Site Addre',
+            'last_editor': 'last_edite',
+            'time_last_updated': 'last_edi_1',
             'the_geom': 'POINT'
             }
 

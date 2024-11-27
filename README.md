@@ -42,10 +42,10 @@ $ python manage.py migrate
 
 The project requires several datasets from [NOLA Open Data](https://data.nola.gov), specifically:
 
-* [Site Address Point](https://data.nola.gov/d/awd4-9fzf)
-* [Building Footprint](https://data.nola.gov/d/m3gg-u447)
-* [Parcels](https://data.nola.gov/d/4tiv-n7fd)
-* [Zoning Districts](https://data.nola.gov/d/25ka-xtj7)
+* [Site Address Point](https://data.nola.gov/Geographic-Base-Layers/Site-Address-Point/hfvu-md72/about_data)
+* [Building Footprint](https://data.nola.gov/Real-Estate-Land-Records/Building-Footprint/prh5-qsuf/about_data)
+* [Parcels](https://data.nola.gov/dataset/Parcels/v9q5-fz7t/about_data)
+* [Zoning Districts](https://data.nola.gov/Planning-Zoning/Zoning-Districts/bizp-xi7c/about_data)
 
 The project includes an app called `etl` that should handle this for you (please open an issue if it does not!). This will eventually be turned into a [Django management command](https://docs.djangoproject.com/en/2.0/howto/custom-management-commands/), but until then you'll have to do it from an interactive shell:
 
@@ -60,9 +60,19 @@ $ python manage.py shell
 
 It could take several minutes to finish, depending on your internet connection speed and computer processing power.
 
+If you are re-running the data load you will need to purge the db first:
+
+```python
+>>> from myimpact.models import *
+>>> SiteAddressPoint.objects.all().delete()
+>>> BuildingFootprint.objects.all().delete()
+>>> Parcel.objects.all().delete()
+>>> ZoningDistrict.objects.all().delete()
+```
+
 ### Run Tests
 
-TODO: write more of these
+TODO: write more of these - *Not currently functional. Uses outdated endpoints.*
 
 ```bash
 $ python manage.py test
@@ -79,6 +89,11 @@ You should now be able to access the proof-of-concept web form at http://localho
 ```bash
 $ python manage.py runserver 0.0.0.0:8181
 ```
+
+## Changelog
+
+* Nov. 2024: Django and all packages updated. ETL changed to accomodate new nola.gov format (csv, no longer offering shapefiles).
+
 
 ## Known Issues
 
